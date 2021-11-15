@@ -67,10 +67,14 @@ function getArgs() {
 
     for (const row of data) {
       const [foldername, pageURL] = row;
-      const result = await extractMainImagesFromAMZ(pageURL);
 
-      await saveImagesFromUrl(result, baseDirectory, foldername);
-      console.log(`--Completed folder #${foldername} `);
+      try {
+        const result = await extractMainImagesFromAMZ(pageURL);
+        await saveImagesFromUrl(result, baseDirectory, foldername);
+        console.log(`--Completed folder #${foldername} `);
+      } catch (error) {
+        console.log(`--Failed to process folder #${foldername}`);
+      }
     }
 
     console.log("Images have been downloaded successfully!");
