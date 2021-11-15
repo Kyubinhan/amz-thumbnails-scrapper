@@ -13,12 +13,16 @@ async function extractMainImagesFromAMZ(pageURL) {
 
     // Navigate to the page URL and ensure that we wait for the for the network request to complete
     await page.goto(pageURL, { waitUntil: "networkidle0" });
-    // Wait for the html body tag to render
-    await page.waitForSelector("body");
+    // Wait for the thumbnail images to be loaded
+    await page.waitForSelector("#altImages");
 
     const imageBank = await page.evaluate(() => {
       // Click individual thumbnails first to load main images in the page
       const altImagesContainer = document.querySelector("#altImages");
+      if (!altImagesContainer) {
+        throw new Error("Couldn't find images!");
+      }
+
       const thumbnailImages = altImagesContainer.querySelectorAll(
         "li.imageThumbnail img"
       );
