@@ -17,12 +17,13 @@ async function extractMainImagesFromAMZ(pageURL) {
     await page.waitForSelector("#altImages");
 
     const imageBank = await page.evaluate(() => {
-      // Click individual thumbnails first to load main images in the page
+      // Grab the thumbnail images container
       const altImagesContainer = document.querySelector("#altImages");
       if (!altImagesContainer) {
         throw new Error("Couldn't find images!");
       }
 
+      // Click individual thumbnails first to load main images in the page
       const thumbnailImages = altImagesContainer.querySelectorAll(
         "li.imageThumbnail img"
       );
