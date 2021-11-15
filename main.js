@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs").promises;
 
-const { extractMainImagesFromAMZ, saveImagesFromUrl } = require("./index.js");
+const { extractMainImagesFromAMZ, saveImagesFromUrl } = require("./utils.js");
 
 async function readCSVfile(filepath) {
   console.log(`Reading CSV file: ${filepath}`);
