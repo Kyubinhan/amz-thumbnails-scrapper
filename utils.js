@@ -20,7 +20,7 @@ async function extractMainImagesFromAMZ(pageURL) {
       // Grab the thumbnail images container
       const altImagesContainer = document.querySelector("#altImages");
       if (!altImagesContainer) {
-        throw new Error("Couldn't find images!");
+        throw new Error("Couldn't find images on the page!");
       }
 
       // Click individual thumbnails first to load main images in the page

@@ -27,41 +27,46 @@ async function readCSVfile(filepath) {
 
   const parsed = [];
   rows.forEach((row, idx) => {
-    if (idx === 0) return;
-    if (!row) return;
+    // Ignore the header or empty rows
+    if (idx === 0 || !row) return;
 
-    parsed.push(row.split(","));
+    const splitted = row.split(",");
+    // Each row must have 2 columns
+    if (splitted.length !== 2) return;
+
+    parsed.push(splitted);
   });
 
   return parsed;
 }
 
 function getArgs() {
-  let filepath = `${path.dirname(__filename)}/data.csv`;
-  let baseDirectory = `${path.dirname(__filename)}/images`;
+  // Set default paths
+  let csvFilePath = `${path.dirname(__filename)}/data.csv`;
+  let imageBaseDirectory = `${path.dirname(__filename)}/images`;
 
   const args = process.argv.slice(2);
   args.map((arg) => {
     const [key, value] = arg.split("=");
     if (key === "--csv") {
-      filepath = value;
+      csvFilePath = value;
     } else if (key === "--directory") {
-      baseDirectory = value;
+      imageBaseDirectory = value;
     } else if (key === "--help") {
       throw new Error(helpMessage);
     }
   });
 
-  return { filepath, baseDirectory };
+  return { csvFilePath, imageBaseDirectory };
 }
 
 (async function () {
   try {
-    const { filepath, baseDirectory } = getArgs();
+    const { csvFilePath, imageBaseDirectory } = getArgs();
 
     console.log("Running the script...");
 
-    const data = await readCSVfile(filepath);
+    const data = await readCSVfile(csvFilePath);
 
     console.log("Start downloading images...");
 
@@ -70,15 +75,17 @@ function getArgs() {
 
       try {
         const result = await extractMainImagesFromAMZ(pageURL);
-        await saveImagesFromUrl(result, baseDirectory, foldername);
-        console.log(`--Completed folder #${foldername} `);
+        await saveImagesFromUrl(result, imageBaseDirectory, foldername);
+        console.log(`--Completed folder #${foldername}`);
       } catch (error) {
-        console.log(`--Failed to process folder #${foldername}`);
+        console.log(
+          `--Failed to process folder #${foldername}: (${error.message})`
+        );
       }
     }
 
     console.log("Images have been downloaded successfully!");
-    console.log(`Check directory: ${baseDirectory}`);
+    console.log(`Check directory: ${imageBaseDirectory}`);
   } catch (error) {
     console.log(error.message);
   }
