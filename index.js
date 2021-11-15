@@ -3,10 +3,9 @@
 const fetch = require("node-fetch");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
-const path = require("path");
 
 // Extract all imageLinks from the page
-async function extractImageLinks(pageURL) {
+async function extractMainImagesFromAMZ(pageURL) {
   const browser = await puppeteer.launch({ headless: true });
 
   try {
@@ -66,13 +65,6 @@ function checkDirectory(dir) {
   }
 }
 
-function getDirectory() {
-  const directory = process.argv[3] || `${path.dirname(__filename)}/images`;
-  checkDirectory(directory);
-
-  return directory;
-}
-
 async function saveImageToDisk(url, filename, directory) {
   const res = await fetch(url);
   const dest = fs.createWriteStream(`${directory}/${filename}`);
@@ -80,30 +72,16 @@ async function saveImageToDisk(url, filename, directory) {
   res.body.pipe(dest);
 }
 
-(async function () {
-  try {
-    // Get the page url from the user
-    const pageURL = process.argv[2];
-    if (!pageURL) {
-      throw new Error("Please provide the page url!");
-    }
+async function saveImagesFromUrl(result, baseDirectory, foldername) {
+  const directory = `${baseDirectory}/${foldername}`;
+  checkDirectory(directory);
 
-    console.log("Running the script...");
+  await Promise.all(
+    result.map(({ src, filename }) => saveImageToDisk(src, filename, directory))
+  );
+}
 
-    const result = await extractImageLinks(pageURL);
-
-    const directory = getDirectory();
-
-    // Download all the images in parallel
-    await Promise.all(
-      result.map(({ src, filename }) =>
-        saveImageToDisk(src, filename, directory)
-      )
-    );
-
-    console.log("Images have been downloaded successfully!");
-    console.log(`Check directory: ${directory}`);
-  } catch (error) {
-    console.log(error.message);
-  }
-})();
+module.exports = {
+  extractMainImagesFromAMZ,
+  saveImagesFromUrl,
+};
