@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs").promises;
 
-const { extractMainImagesFromAMZ, saveImagesFromUrl } = require("./utils.js");
+const { extractImageSources, saveImagesFromUrl } = require("./utils.js");
 
 const helpMessage = `
   How to use this script
@@ -74,7 +74,7 @@ function getArgs() {
       const [foldername, pageURL] = row;
 
       try {
-        const result = await extractMainImagesFromAMZ(pageURL);
+        const result = await extractImageSources(pageURL);
         await saveImagesFromUrl(result, imageBaseDirectory, foldername);
         console.log(`--Completed folder #${foldername}`);
       } catch (error) {

@@ -4,25 +4,20 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
 
-// Extract all imageLinks from the page
-async function extractMainImagesFromAMZ(pageURL) {
+async function extractImageSources(pageURL) {
   const browser = await puppeteer.launch({ headless: true });
 
   try {
     const page = await browser.newPage();
 
-    // Navigate to the page URL and ensure that we wait for the for the network request to complete
+    // Navigate to the page URL and ensure that we wait for the network request to complete
     await page.goto(pageURL, { waitUntil: "networkidle0" });
-    // Wait for the thumbnail images to be loaded
+    // Wait for all the thumbnail images to be loaded
     await page.waitForSelector("#altImages");
 
     const imageBank = await page.evaluate(() => {
       // Grab the thumbnail images container
       const altImagesContainer = document.querySelector("#altImages");
-      if (!altImagesContainer) {
-        throw new Error("Couldn't find images on the page!");
-      }
-
       // Click individual thumbnails first to load main images in the page
       const thumbnailImages = altImagesContainer.querySelectorAll(
         "li.imageThumbnail img"
@@ -87,6 +82,6 @@ async function saveImagesFromUrl(result, baseDirectory, foldername) {
 }
 
 module.exports = {
-  extractMainImagesFromAMZ,
+  extractImageSources,
   saveImagesFromUrl,
 };
