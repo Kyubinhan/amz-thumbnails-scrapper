@@ -3,6 +3,22 @@ const fs = require("fs").promises;
 
 const { extractMainImagesFromAMZ, saveImagesFromUrl } = require("./utils.js");
 
+const helpMessage = `
+  How to use this script
+
+  * This will read data from ./data.csv and save images under /images
+  node main.js
+
+  * Use --csv to set your csv file path
+  node main.js --csv=your/csv/file/path
+
+  * Use --directory to set your base directory path for image download
+  node main.js --directory=your/base/directory/
+  
+  * You can use --csv and --directory both like this
+  node main.js --csv=your/csv/file/path --directory=your/base/directory/
+`;
+
 async function readCSVfile(filepath) {
   console.log(`Reading CSV file: ${filepath}`);
 
@@ -20,15 +36,32 @@ async function readCSVfile(filepath) {
   return parsed;
 }
 
+function getArgs() {
+  let filepath = `${path.dirname(__filename)}/data.csv`;
+  let baseDirectory = `${path.dirname(__filename)}/images`;
+
+  const args = process.argv.slice(2);
+  args.map((arg) => {
+    const [key, value] = arg.split("=");
+    if (key === "--csv") {
+      filepath = value;
+    } else if (key === "--directory") {
+      baseDirectory = value;
+    } else if (key === "--help") {
+      throw new Error(helpMessage);
+    }
+  });
+
+  return { filepath, baseDirectory };
+}
+
 (async function () {
   try {
+    const { filepath, baseDirectory } = getArgs();
+
     console.log("Running the script...");
 
-    const filepath = process.argv[2] || `${path.dirname(__filename)}/data.csv`;
     const data = await readCSVfile(filepath);
-
-    const baseDirectory =
-      process.argv[3] || `${path.dirname(__filename)}/images`;
 
     console.log("Start downloading images...");
     await Promise.all(
