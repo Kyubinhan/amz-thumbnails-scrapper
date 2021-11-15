@@ -64,12 +64,14 @@ function getArgs() {
     const data = await readCSVfile(filepath);
 
     console.log("Start downloading images...");
-    await Promise.all(
-      data.map(async ([foldername, pageUrl]) => {
-        const result = await extractMainImagesFromAMZ(pageUrl);
-        await saveImagesFromUrl(result, baseDirectory, foldername);
-      })
-    );
+
+    for (const row of data) {
+      const [foldername, pageURL] = row;
+      const result = await extractMainImagesFromAMZ(pageURL);
+
+      await saveImagesFromUrl(result, baseDirectory, foldername);
+      console.log(`--Completed folder #${foldername} `);
+    }
 
     console.log("Images have been downloaded successfully!");
     console.log(`Check directory: ${baseDirectory}`);
