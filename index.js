@@ -18,11 +18,18 @@ async function extractImageLinks(pageURL) {
     await page.waitForSelector("body");
 
     const imageBank = await page.evaluate(() => {
-      // Select the container of the thumbnail images
+      // Click individual thumbnails first to load main images in the page
       const altImagesContainer = document.querySelector("#altImages");
-      // Then select individual images and convert them into an array
+      const thumbnailImages = altImagesContainer.querySelectorAll(
+        "li.imageThumbnail img"
+      );
+      for (let ti of thumbnailImages) {
+        ti.click();
+      }
+
+      // Then grab all the main images and convert them into an array
       const imageTags = Array.from(
-        altImagesContainer.querySelectorAll("li.imageThumbnail img")
+        document.querySelectorAll("div.imgTagWrapper img")
       );
 
       const imageArray = [];
