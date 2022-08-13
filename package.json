@@ -1,10 +1,11 @@
 {
   "name": "a-scrapper",
   "version": "1.0.0",
-  "description": "",
+  "description": "A small JS project to download thumbnail images using Puppeteer.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node main.js",
+    "start:examples": "node main.js --csv=./examples.csv"
   },
   "author": "",
   "license": "ISC",
