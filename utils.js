@@ -10,8 +10,8 @@ async function extractImageSources(pageURL) {
   try {
     const page = await browser.newPage();
 
-    // Navigate to the page URL and ensure that we wait for the network request to complete
-    await page.goto(pageURL, { waitUntil: "networkidle0" });
+    // Navigate to the page URL and ensure that DOM content has been loaded
+    await page.goto(pageURL, { waitUntil: "domcontentloaded" });
     // Wait for all the thumbnail images to be loaded
     await page.waitForSelector("#altImages");
 
