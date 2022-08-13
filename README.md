@@ -13,3 +13,9 @@ Note: most of code was reused from this [article](https://dev.to/microworlds/ima
 3. run `npm start` or `node main.js`
 
 run `node main.js --help` if you need to read the manual.
+
+---
+
+List of downloaded images with `examples.csv`
+
+![download-demo](demo.png)
