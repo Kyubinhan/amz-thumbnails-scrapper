@@ -18,7 +18,7 @@ async function extractImageSources(pageURL) {
     const imageBank = await page.evaluate(() => {
       // Grab the thumbnail images container
       const altImagesContainer = document.querySelector("#altImages");
-      // Click individual thumbnails first to load main images in the page
+      // Click through individual thumbnails to load their higher res images in the page
       const thumbnailImages = altImagesContainer.querySelectorAll(
         "li.imageThumbnail img"
       );
@@ -37,8 +37,7 @@ async function extractImageSources(pageURL) {
         const src = image.src;
 
         const srcArray = src.split("/");
-        const pos = srcArray.length - 1;
-        const filename = srcArray[pos];
+        const filename = srcArray[srcArray.length - 1];
 
         imageArray.push({
           src,
@@ -81,7 +80,29 @@ async function saveImagesFromUrl(result, baseDirectory, foldername) {
   );
 }
 
+async function readCSVfile(filepath) {
+  console.log(`Reading CSV file: ${filepath}`);
+
+  const data = await fs.promises.readFile(filepath, "utf8");
+  const rows = data.split(/\r?\n|\r/); // match all possible newline representations
+
+  const parsed = [];
+  rows.forEach((row, idx) => {
+    // Ignore the header or empty rows
+    if (idx === 0 || !row) return;
+
+    const splitted = row.split(",");
+    // Each row must have 2 columns
+    if (splitted.length !== 2) return;
+
+    parsed.push(splitted);
+  });
+
+  return parsed;
+}
+
 module.exports = {
   extractImageSources,
+  readCSVfile,
   saveImagesFromUrl,
 };

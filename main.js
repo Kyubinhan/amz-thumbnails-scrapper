@@ -1,7 +1,6 @@
 const path = require("path");
-const fs = require("fs").promises;
 
-const { extractImageSources, saveImagesFromUrl } = require("./utils.js");
+const utils = require("./utils.js");
 
 const helpMessage = `
   How to use this script
@@ -18,27 +17,6 @@ const helpMessage = `
   * You can use --csv and --directory both like this
   node main.js --csv=your/csv/file/path --directory=your/base/directory/
 `;
-
-async function readCSVfile(filepath) {
-  console.log(`Reading CSV file: ${filepath}`);
-
-  const data = await fs.readFile(filepath, "utf8");
-  const rows = data.split("\r\n");
-
-  const parsed = [];
-  rows.forEach((row, idx) => {
-    // Ignore the header or empty rows
-    if (idx === 0 || !row) return;
-
-    const splitted = row.split(",");
-    // Each row must have 2 columns
-    if (splitted.length !== 2) return;
-
-    parsed.push(splitted);
-  });
-
-  return parsed;
-}
 
 function getArgs() {
   // Set default paths
@@ -66,7 +44,9 @@ function getArgs() {
 
     console.log("Running the script...");
 
-    const data = await readCSVfile(csvFilePath);
+    const data = await utils.readCSVfile(csvFilePath);
+
+    console.log(`${data.length} url(s) received...`);
 
     console.log("Start downloading images...");
 
@@ -74,8 +54,8 @@ function getArgs() {
       const [foldername, pageURL] = row;
 
       try {
-        const result = await extractImageSources(pageURL);
-        await saveImagesFromUrl(result, imageBaseDirectory, foldername);
+        const result = await utils.extractImageSources(pageURL);
+        await utils.saveImagesFromUrl(result, imageBaseDirectory, foldername);
         console.log(`--Completed folder #${foldername}`);
       } catch (error) {
         console.log(
